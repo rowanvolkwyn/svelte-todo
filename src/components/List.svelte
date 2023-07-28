@@ -8,9 +8,19 @@
 
     }
 
+    function handleUpdate(event) {
+        const index = $items.findIndex(item => item.id === event.detail.id);
+        $items[index] = event.detail;
+        ToDoApi.save($items);
+    }
+
+    function handleDelete(event) {
+        console.log("deleting item!")
+    }
+
     onMount(async () => {
         $items = await ToDoApi.getAll();
-
+        $items = [{ id: 1, text: "test", completed: false }]
     })
 </script>
 
@@ -31,7 +41,11 @@
 
 <div class="list">
     {#each $items as item}
-        <Item {...item} />
+        <Item
+            {...item}
+            on:update={handleUpdate}
+            on:delete={handleDelete}
+        />
     {:else} 
         <p class="list-status">Nothing to do... go code</p>
     {/each}

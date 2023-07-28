@@ -1,5 +1,21 @@
 <script>
+    import { createEventDispatcher } from "svelte";
     export let id, text, completed;
+    
+    const dispatch = createEventDispatcher();
+
+    function triggerUpdate() {
+        dispatch("update", { id, text, completed });
+    }
+
+    function handleDoubleClick() {
+        const yes = confirm("Are you sure you want to delete this item?");
+        
+        if (yes) {
+            dispatch("delete",  id );
+        }
+
+    }
 </script>
 
 <style>
@@ -9,6 +25,15 @@
         width: 100%;
         padding: 10px;
         background: white;
+    }
+
+    .item.completed {
+        background: #ddd;
+    }
+
+    .item.completed .text-input {
+        color: #555;
+        text-decoration: line-through;
     }
 
     .item:focus-within {
@@ -29,17 +54,20 @@
     }
 </style>
 
-<div class="item">
+<div class="item" class:completed on:dblclick={handleDoubleClick}>
     <input 
         type="text"
         class="text-input"
         bind:value={text}
         readonly={completed}
+        on:keyup={({ key, target}) => key === "Enter" && target.blur()}
+        on:blur={() => triggerUpdate()}
     />
     <input
         class="completed-checkbox"
         type="checkbox"
         bind:checked={completed}
+        on:change={() => triggerUpdate()}
     />
 </div>
     
