@@ -1,5 +1,8 @@
 <script>
+    import { items } from "../stores.js";
 
+    $: itemCount = $items.length;
+    $: completedItemCount = $items.filter((item) => item.completed).length;
 </script>
 
 <style>
@@ -17,5 +20,5 @@
 
 <div class="header">
     <span>Rovo's To-Do List</span>
-    <span>0/0</span>
+    <span>{completedItemCount}/{itemCount}</span>
 </div>
