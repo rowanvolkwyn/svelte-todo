@@ -1,11 +1,21 @@
 <script>
     import { onMount } from "svelte";
+    import { v4 as uuidv4 } from "uuid";
     import { items } from "../stores"
     import ToDoApi from "../ToDoApi.js";
     import Item from "./Item.svelte";
+    import NewItem from "./NewItem.svelte";
 
     function handleNewItem(event) {
-
+        $items = [
+            {
+                id: uuidv4(),
+                text: event.detail,
+                completed: false
+            },
+            ...$items
+        ];
+        ToDoApi.save($items);
     }
 
     function handleUpdate(event) {
@@ -15,7 +25,18 @@
     }
 
     function handleDelete(event) {
-        console.log("deleting item!")
+        $items = $items.filter(item => item.id !== event.detail);
+        ToDoApi.save($items);
+    }
+
+    let itemsSorted = [];
+    $: {
+        itemsSorted = [...$items];
+        itemsSorted.sort((a, b) => {
+            if (a.completed && b.completed) return 0;
+            if (a.completed) return 1;
+            if (b.completed) return -1;
+        })
     }
 
     onMount(async () => {
@@ -40,7 +61,8 @@
 </style>
 
 <div class="list">
-    {#each $items as item}
+    <NewItem on:newItem={handleNewItem} />
+    {#each itemsSorted as item}
         <Item
             {...item}
             on:update={handleUpdate}
